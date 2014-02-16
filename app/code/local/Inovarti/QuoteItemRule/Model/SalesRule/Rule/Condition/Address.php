@@ -21,6 +21,15 @@ class Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address extends Mage
 
     public function loadAttributeOptions() {
         $attributes = array(
+            'base_subtotal' => Mage::helper('salesrule')->__('Subtotal'),
+            'total_qty' => Mage::helper('salesrule')->__('Total Items Quantity'),
+            'weight' => Mage::helper('salesrule')->__('Total Weight'),
+            'payment_method' => Mage::helper('salesrule')->__('Payment Method'),
+            'shipping_method' => Mage::helper('salesrule')->__('Shipping Method'),
+            'postcode' => Mage::helper('salesrule')->__('Shipping Postcode'),
+            'region' => Mage::helper('salesrule')->__('Shipping Region'),
+            'region_id' => Mage::helper('salesrule')->__('Shipping State/Province'),
+            'country_id' => Mage::helper('salesrule')->__('Shipping Country'),
             'cc_type' => Mage::helper('salesrule')->__('Credit Card Type'),
             'cc_parcelamento' => Mage::helper('salesrule')->__('Parcelamento'),
         );
@@ -32,10 +41,10 @@ class Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address extends Mage
 
     public function getInputType() {
         switch ($this->getAttribute()) {
-            case 'cc_parcelamento':
+            case 'base_subtotal': case 'weight': case 'total_qty': case 'cc_parcelamento':
                 return 'numeric';
 
-            case 'cc_type':
+            case 'shipping_method': case 'payment_method': case 'country_id': case 'cc_type': case 'region_id':
                 return 'select';
         }
         return 'string';
@@ -43,7 +52,7 @@ class Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address extends Mage
 
     public function getValueElementType() {
         switch ($this->getAttribute()) {
-            case 'cc_type' :
+            case 'shipping_method': case 'payment_method': case 'country_id': case 'region_id': case 'cc_type' :
                 return 'select';
         }
         return 'text';
@@ -52,6 +61,26 @@ class Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address extends Mage
     public function getValueSelectOptions() {
         if (!$this->hasData('value_select_options')) {
             switch ($this->getAttribute()) {
+                case 'country_id':
+                    $options = Mage::getModel('adminhtml/system_config_source_country')
+                            ->toOptionArray();
+                    break;
+
+                case 'region_id':
+                    $options = Mage::getModel('adminhtml/system_config_source_allregion')
+                            ->toOptionArray();
+                    break;
+
+                case 'shipping_method':
+                    $options = Mage::getModel('adminhtml/system_config_source_shipping_allmethods')
+                            ->toOptionArray();
+                    break;
+
+                case 'payment_method':
+                    $options = Mage::getModel('adminhtml/system_config_source_payment_allmethods')
+                            ->toOptionArray();
+                    break;
+
                 case 'cc_type':
                     $options = Mage::getModel('adminhtml/system_config_source_payment_cctype')
                             ->toOptionArray();
@@ -83,6 +112,9 @@ class Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address extends Mage
             }
         }
 
+        if ('payment_method' == $this->getAttribute() && ! $address->hasPaymentMethod()) {
+            $address->setPaymentMethod($object->getQuote()->getPayment()->getMethod());
+        }
         if ('cc_type' == $this->getAttribute() && !$address->hasCcType()) {
             $address->setCcType($object->getQuote()->getPayment()->getCcType());
         }
