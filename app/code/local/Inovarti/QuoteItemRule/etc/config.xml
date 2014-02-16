@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Inovarti_QuoteItemRule>
+            <version>1.0.0.0</version>
+        </Inovarti_QuoteItemRule>
+    </modules>
+    <global>
+        <helpers>
+            <quoteitemrule>
+                <class>Inovarti_QuoteItemRule_Helper</class>
+            </quoteitemrule>
+        </helpers>
+        <models>
+            <salesrule>
+                <rewrite>
+                    <rule_condition_address>Inovarti_QuoteItemRule_Model_SalesRule_Rule_Condition_Address</rule_condition_address>
+                </rewrite>
+            </salesrule>
+        </models>
+    </global>
+</config>
